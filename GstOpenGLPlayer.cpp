@@ -200,9 +200,9 @@ bool GstOpenGLPlayer::create_pipeline(const std::string &source)
     {
         // 本地文件
         // pipeline_str = "filesrc location=" + source + " ! "
-        //                                               "decodebin ! videoconvert !"
+        //                                               "decodebin ! videoconvert ! "
         //                                               "video/x-raw,format=RGBA ! "
-        //                                               "queue ! appsink name=sink emit-signals=true sync=true";
+        //                                               "queue ! myelement ! appsink name=sink emit-signals=true sync=true";
         // pipeline_str = "filesrc location=" + source + " ! "
         //                                               "decodebin name=dec ! "
         //                                               "queue ! videoconvert ! video/x-raw,format=RGBA ! appsink name=sink emit-signals=true sync=true ";
@@ -210,7 +210,7 @@ bool GstOpenGLPlayer::create_pipeline(const std::string &source)
         pipeline_str = "filesrc location=" + source + " ! "
                                                       "matroskademux name=dec ! "
                                                       "queue ! vorbisdec ! audioresample ! autoaudiosink dec. !"
-                                                      "queue ! vp8dec ! videoconvert ! textoverlay name=overlay font-desc=\"Sans Bold 10\" ! video/x-raw,format=RGBA ! appsink name=sink emit-signals=true sync=true";
+                                                      "queue ! vp8dec ! videoconvert ! myelement ! textoverlay name=overlay font-desc=\"Sans Bold 10\" ! video/x-raw,format=RGBA ! appsink name=sink emit-signals=true sync=true";
         // pipeline_str = "filesrc location=" + source + " ! "
         //                                               "qtdemux name=dec "
         //                                               "dec.video_0  ! queue ! decodebin ! videoconvert ! video/x-raw,format=RGBA ! appsink name=sink emit-signals=true sync=true";
@@ -416,7 +416,7 @@ void GstOpenGLPlayer::update_display(gpointer user_data)
         player->update_overlay_text();
     }
 
-    printf("更新");
+    printf("更新\r\n");
     return;
 }
 

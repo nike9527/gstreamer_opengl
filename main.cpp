@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     std::cout << "Video source: " << video_source << std::endl;
 
     GstOpenGLPlayer player(1280, 720);
-
+ 
     if (!player.initialize(video_source))
     {
         std::cerr << "Failed to initialize player" << std::endl;

@@ -20,6 +20,8 @@ set(GLFW_DIR "${CMAKE_SOURCE_DIR}/GLFW")
 set(GSTREAMER_DIR "D:/Program Files/gstreamer/1.0/msvc_x86_64")
 set(GSTREAMER_LIBRARY_DIR "${GSTREAMER_DIR}/lib")
 set(GSTREAMER_BIN_DIR "${GSTREAMER_DIR}/bin")
+#插件目录
+set(PLUGIN_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/plugin")
 
 # 设置 GStreamer 相关变量
 set(GSTREAMER_INCLUDE_DIRS
@@ -40,7 +42,6 @@ set(GSTREAMER_LIBRARIES
     "${GSTREAMER_LIBRARY_DIR}/gobject-2.0.lib"
     "${GSTREAMER_LIBRARY_DIR}/gio-2.0.lib"
 )
-
 # 验证路径是否存在
 message(STATUS "GStreamer directory: ${GSTREAMER_DIR}")
 message(STATUS "GStreamer includes: ${GSTREAMER_INCLUDE_DIRS}")
@@ -88,6 +89,20 @@ set_target_properties(cuda_gstreamer PROPERTIES
 
 # 添加环境变量设置（用于调试）
 if(WIN32)
+    # 复制插件 DLL 到可执行文件目录（运行时需要）
+    add_custom_command(TARGET cuda_gstreamer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            $<TARGET_FILE_DIR:cuda_gstreamer>/gstreamer-1.0
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PLUGIN_LIBRARY_DIR}/gstmyelement.dll"
+            $<TARGET_FILE_DIR:cuda_gstreamer>/gstreamer-1.0/
+        COMMENT "Copying plugin DLL for runtime"
+    )
+    
+    # 设置运行时 PATH（用于调试）
+    set_target_properties(cuda_gstreamer PROPERTIES
+        VS_DEBUGGER_ENVIRONMENT "PATH=${GSTREAMER_BIN_DIR};%PATH%"
+    )
     # 运行时需要设置 PATH
     # add_custom_command(TARGET cuda_gstreamer POST_BUILD
     #     COMMENT "Copying required DLLs..."
